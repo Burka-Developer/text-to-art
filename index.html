@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Pixel Art - Animated Grid</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    textarea {
+      width: 300px;
+      height: 80px;
+      font-size: 16px;
+      padding: 10px;
+      margin: 10px;
+    }
+    canvas {
+      margin-top: 20px;
+      border: 2px solid #fff;
+      background-color: #000;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Animated Pixel Grid Art</h1>
+  <textarea id="textInput" placeholder="Enter your text..."></textarea><br>
+  <button onclick="generateArt()">Generate Animated Art</button>
+  <canvas id="pixelCanvas" width="480" height="480"></canvas>
+
+  <script>
+    function textToBinary(text) {
+      return text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
+    }
+
+    function generateArt() {
+      const text = document.getElementById('textInput').value;
+      const binary = textToBinary(text);
+      const canvas = document.getElementById('pixelCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const size = 20;
+      const cols = Math.floor(canvas.width / size);
+      const rows = Math.floor(canvas.height / size);
+      const maxBits = cols * rows;
+
+      const paddedBinary = binary.padEnd(maxBits, '0');
+
+      let i = 0;
+
+      function drawStep() {
+        if (i >= paddedBinary.length) return;
+
+        const x = (i % cols) * size;
+        const y = Math.floor(i / cols) * size;
+        const bit = paddedBinary[i];
+        const color = bit === '1' ? '#00e676' : '#333';
+
+        ctx.fillStyle = color;
+        ctx.shadowColor = bit === '1' ? '#00ffea' : '#000';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(x, y, size, size);
+
+        i++;
+        setTimeout(drawStep, 5); // faster animation
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawStep();
+    }
+  </script>
+</body>
+</html>
